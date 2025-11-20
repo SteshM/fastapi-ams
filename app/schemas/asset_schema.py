@@ -2,7 +2,7 @@ from datetime import date
 import uuid
 
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 class AssetCreateSchema(BaseModel):
     name: str
@@ -20,6 +20,10 @@ class AssetResponse(BaseModel):
     description: Optional[str] = None
     status: str 
 
-
+    
     class Config:
         orm_mode = True
+
+class AssetsListResponse(BaseModel):
+    total: int
+    items: List[AssetResponse]        
