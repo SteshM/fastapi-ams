@@ -26,4 +26,12 @@ class AssetResponse(BaseModel):
 
 class AssetsListResponse(BaseModel):
     total: int
-    items: List[AssetResponse]        
+    items: List[AssetResponse]  
+
+
+class AssetUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    purchase_date: Optional[date] = None
+    status: Optional[str] = None

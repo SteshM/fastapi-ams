@@ -3,8 +3,8 @@ from datetime import date
 from typing import Optional
 import uuid
 from app.models.asset import Asset
-from app.schemas.asset_schema import AssetCreateSchema, AssetResponse, AssetsListResponse
-from app.services.asset import create_asset, get_asset_by_id, get_assets
+from app.schemas.asset_schema import AssetCreateSchema, AssetResponse, AssetUpdateSchema, AssetsListResponse
+from app.services.asset import create_asset, get_asset_by_id, get_assets, update_asset
 from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, Query
 from app.core.database import get_db
@@ -43,3 +43,7 @@ def list_assets(
         sort_by=sort_by,
         sort_order=sort_order
     )
+
+@router.put("/assets/{asset_id}", response_model=AssetResponse)
+def update_asset_endpoint(asset_id: uuid.UUID, data: AssetUpdateSchema, db: Session = Depends(get_db)):
+    return update_asset(db, asset_id, data)
