@@ -1,19 +1,24 @@
 from datetime import date
+import uuid
+
 from pydantic import BaseModel
 from typing import Optional
 
-class AssetSchema(BaseModel):
+class AssetCreateSchema(BaseModel):
     name: str
     category: str
     purchase_date: date
+    description: Optional[str] = None
+    status: str
 
-    class AssetResponse(BaseModel): 
-        id: str
-        name: str
-        category: str
-        purchase_date: date
-        description: Optional[str] = None
-        status: str
+
+class AssetResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    category: str
+    purchase_date: date
+    description: Optional[str] = None
+    status: str 
 
 
     class Config:
