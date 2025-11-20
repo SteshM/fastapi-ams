@@ -1,6 +1,12 @@
 from fastapi import FastAPI
+from app.core.database import Base, engine
 
-app = FastAPI()
+
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Asset Management System")
+
 
 @app.get("/")
 def home():
