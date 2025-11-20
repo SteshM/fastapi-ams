@@ -26,6 +26,7 @@ def create_asset(db: Session, data: AssetCreateSchema):
         raise e
 
 
+
 def get_asset_by_id(db: Session, asset_id: uuid.UUID) -> Asset:
     asset = db.query(Asset).filter(Asset.id == asset_id).first()
     if not asset:
@@ -34,6 +35,8 @@ def get_asset_by_id(db: Session, asset_id: uuid.UUID) -> Asset:
             detail=f"Asset with id {asset_id} not found"
         )
     return asset
+
+
 
 def get_assets(
     db: Session,
@@ -78,6 +81,7 @@ def get_assets(
 
 
 
+
 def update_asset(db: Session, asset_id: uuid.UUID, data: AssetUpdateSchema):
     asset = db.query(Asset).filter(Asset.id == asset_id).first()
     if not asset:
@@ -93,4 +97,20 @@ def update_asset(db: Session, asset_id: uuid.UUID, data: AssetUpdateSchema):
     db.commit()
     db.refresh(asset)
     return asset
+
+
+
+
+def soft_delete_asset(db: Session, asset_id: uuid.UUID):
+    asset = db.query(Asset).filter(Asset.id == asset_id, Asset.deleted == False).first()
+    if not asset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset with id {asset_id} not found or already deleted"
+        )
+    
+    asset.deleted = True
+    db.commit()
+    return {"message": f"Asset {asset_id} successfully soft-deleted"}
+
 

@@ -4,7 +4,7 @@ from typing import Optional
 import uuid
 from app.models.asset import Asset
 from app.schemas.asset_schema import AssetCreateSchema, AssetResponse, AssetUpdateSchema, AssetsListResponse
-from app.services.asset import create_asset, get_asset_by_id, get_assets, update_asset
+from app.services.asset import create_asset, get_asset_by_id, get_assets, soft_delete_asset, update_asset
 from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, Query
 from app.core.database import get_db
@@ -19,6 +19,7 @@ def create_newasset(payload: AssetCreateSchema, db: Session = Depends(get_db)):
 @router.get("/assets/{asset_id}", response_model=AssetResponse)
 def get_asset(asset_id: uuid.UUID, db: Session = Depends(get_db)):
     return get_asset_by_id(db, asset_id)
+
 
 @router.get("/assets", response_model=AssetsListResponse)
 def list_assets(
@@ -47,3 +48,8 @@ def list_assets(
 @router.put("/assets/{asset_id}", response_model=AssetResponse)
 def update_asset_endpoint(asset_id: uuid.UUID, data: AssetUpdateSchema, db: Session = Depends(get_db)):
     return update_asset(db, asset_id, data)
+
+
+@router.delete("/assets/{asset_id}")
+def soft_delete_asset_endpoint(asset_id: uuid.UUID, db: Session = Depends(get_db)):
+    return soft_delete_asset(db, asset_id)

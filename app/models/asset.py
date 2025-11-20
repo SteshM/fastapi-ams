@@ -1,5 +1,5 @@
 # models/asset.py
-from sqlalchemy import Column, String, Date
+from sqlalchemy import Column, String, Date, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from app.core.database import Base
@@ -13,3 +13,5 @@ class Asset(Base):
     category = Column(String, nullable=False)
     purchase_date = Column(Date, nullable=False)
     status = Column(String, nullable=False)
+    deleted = Column(Boolean, default=False, nullable=False)
+
