@@ -2,11 +2,10 @@
 from datetime import date
 from typing import Optional
 import uuid
-from app.models.asset import Asset
 from app.schemas.asset_schema import AssetCreateSchema, AssetResponse, AssetUpdateSchema, AssetsListResponse
 from app.services.asset import create_asset, get_asset_by_id, get_assets, soft_delete_asset, update_asset
 from sqlalchemy.orm import Session
-from fastapi import Depends, APIRouter, Query
+from fastapi import Depends, APIRouter, Query, HTTPException, status
 from app.core.database import get_db
 
 router = APIRouter(prefix="/api/v1", tags=["Assets"])
@@ -17,8 +16,15 @@ def create_newasset(payload: AssetCreateSchema, db: Session = Depends(get_db)):
     
 
 @router.get("/assets/{asset_id}", response_model=AssetResponse)
-def get_asset(asset_id: uuid.UUID, db: Session = Depends(get_db)):
-    return get_asset_by_id(db, asset_id)
+def get_asset(asset_id: uuid.UUID, db: Session = Depends(get_db), include_deleted: bool = False):
+    asset = get_asset_by_id(db, asset_id, include_deleted)
+    if not asset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset with id {asset_id} not found"
+        )
+    return asset
+
 
 
 @router.get("/assets", response_model=AssetsListResponse)
@@ -31,7 +37,9 @@ def list_assets(
     end_date: Optional[date] = None,
     sort_by: Optional[str] = Query("purchase_date"),
     sort_order: Optional[str] = Query("desc"),
+    deleted: Optional[bool] = False,
     db: Session = Depends(get_db)
+
 ):
     return get_assets(
         db=db,
@@ -42,7 +50,8 @@ def list_assets(
         start_date=start_date,
         end_date=end_date,
         sort_by=sort_by,
-        sort_order=sort_order
+        sort_order=sort_order,
+        deleted=deleted,
     )
 
 @router.put("/assets/{asset_id}", response_model=AssetResponse)
